@@ -258,10 +258,12 @@ NO* insereArvore(NO* no, int valor) {
 }
 
 NO* removerArvore(NO* no, int valor) {
+   NO* removerArvore(NO* no, int valor) {
     if (no == NULL) {
         cout << "Elemento NAO encontrado.\n";
-        return no;
+        return NULL;
     }
+
     if (valor < no->valor) {
         no->esq = removerArvore(no->esq, valor);
     }
@@ -269,21 +271,38 @@ NO* removerArvore(NO* no, int valor) {
         no->dir = removerArvore(no->dir, valor);
     }
     else {
-                
-        // Caso 1: Nó sem filhos
-        // Se o nó não possui filhos (esquerda e direita são NULL), basta removê-lo e retornar NULL para o pai.
+        // Caso 1: sem filhos
+        if (no->esq == NULL && no->dir == NULL) {
+            free(no);
+            return NULL;
+        }
 
-        // Caso 2: Nó com apenas um filho
-        // Se o nó possui apenas um filho (esquerda ou direita), retorna o ponteiro para esse filho, liberando o nó atual.
+        // Caso 2: um filho
+        else if (no->esq == NULL) {
+            NO* temp = no->dir;
+            free(no);
+            return temp;
+        }
+        else if (no->dir == NULL) {
+            NO* temp = no->esq;
+            free(no);
+            return temp;
+        }
 
-        // Caso 3: Nó com dois filhos
-        // Se o nó possui dois filhos, encontra o sucessor (menor valor da subárvore direita),
-        // copia o valor do sucessor para o nó atual e remove recursivamente o sucessor.
+        // Caso 3: dois filhos
+        else {
+            // Encontrar o menor da subárvore direita (sucessor)
+            NO* temp = no->dir;
+            while (temp->esq != NULL)
+                temp = temp->esq;
+
+            // Copiar valor do sucessor para o nó atual
+            no->valor = temp->valor;
+
+            // Remover o sucessor da subárvore direita
+            no->dir = removerArvore(no->dir, temp->valor);
+        }
     }
-    // Atualiza altura e balanceia
-    no->altura = maior(alturaNo(no->esq), alturaNo(no->dir)) + 1;
-    return balancearNo(no);
-}
 
 // ---------- Utilidades ----------
 int elementosArvore(NO* no) {
